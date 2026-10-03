@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PHIL-HIST-SUPER-3 — The Philosophical Mapbook</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topline">
+      <div><div class="brand">PHIL-HIST-SUPER-3</div><div class="tiny">READ → INQUIRE → CARRY FORWARD → APPLY</div></div>
+      <div id="saveStatus" class="save-pill"><span class="dot"></span><span class="save-text">Checking storage…</span></div>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="card compact route-select">
+        <label for="routeProfile">Route manifest</label>
+        <select id="routeProfile"></select>
+        <p id="routeDescription" class="tiny muted"></p><p id="routeStateDetail" class="tiny muted"></p>
+        <div class="progress-line"><span id="progressBar"></span></div>
+        <div id="progressText" class="tiny muted" style="margin-top:5px"></div>
+      </div>
+      <div id="nav"></div>
+    </aside>
+    <main class="main">
+      <section class="card hero">
+        <div class="meta"><span class="pill" id="typePill"></span><span class="pill" id="partPill"></span></div>
+        <h1 id="nodeTitle"></h1><p id="nodeSubtitle"></p><p id="nativeObject"></p>
+        <div class="actions"><button class="btn secondary" id="prevBtn">← Previous</button><button class="btn secondary" id="nextBtn">Next →</button></div>
+      </section>
+      <div class="tabs">
+        <button data-tab="read">READ</button><button data-tab="inquire" class="active">INQUIRE</button><button data-tab="map">MAP</button><button data-tab="media">MEDIA</button><button data-tab="data">DATA / RECOVERY</button>
+      </div>
+
+      <section class="card pane" id="pane-read">
+        <h2>Canonical reading layer</h2><div id="readState"></div><p id="pressbooksHint" class="muted"></p>
+        <div class="inline-input"><input id="pressbooksInput" type="url" placeholder="https://your-pressbooks-site/..."><button class="btn secondary" id="savePressbooks">Save URL</button><button class="btn" id="openPressbooks">Open Pressbooks</button></div>
+        <div class="actions"><button class="btn secondary" id="downloadPressbooksTemplate">Download current URL map</button></div>
+      </section>
+
+      <section class="card pane active" id="pane-inquire">
+        <h2>Structured Inquiry — central persistent layer</h2>
+        <div id="inquiryForm"></div>
+        <div class="actions"><a class="btn secondary" id="nativeMapbook" target="_blank" rel="noopener">Open bundled native Mapbook</a><button class="btn" id="importNativeBtn">Import current native work</button><button class="btn warn" id="clearNodeBtn">Clear this central record</button></div>
+        <p id="nativeNote" class="tiny muted"></p><p id="nativeImportNote" class="tiny muted"></p>
+      </section>
+
+      <section class="card pane" id="pane-map">
+        <h2>Persistent Student Map</h2>
+        <div id="mapStats" class="grid3"></div>
+        <div id="ledgerBody"></div>
+      </section>
+
+      <section class="card pane" id="pane-media">
+        <h2>Video / explainer layer</h2><p class="muted">Explainers are supplementary: captions + transcript, no autoplay, and no essential argument available only in video.</p><div id="mediaBody"></div>
+      </section>
+
+      <section class="card pane" id="pane-data">
+        <h2>Data, migration, and recovery</h2>
+        <div class="data-section"><h3>Verified storage</h3><div id="storageDetail" class="good"></div><p class="tiny muted">The app tries IndexedDB first, then localStorage, sessionStorage, and finally in-memory state. Export remains available at every tier.</p></div>
+        <div class="data-section"><h3>Portable exports</h3><div class="actions"><button class="btn" id="exportFull">Export full Student Map</button><button class="btn secondary" id="exportCurrent">Export current record</button><button class="btn secondary" id="exportLedger">Export ledger + applications</button></div></div>
+        <div class="data-section"><h3>Safe import</h3><label class="btn secondary file-label">Choose JSON<input id="importFile" type="file" accept=".json,application/json" class="hidden"></label><div id="importPreview"><p class="muted">No import pending.</p></div><div id="importActions" class="actions hidden"><button class="btn warn" id="importReplace">Replace current map</button><button class="btn" id="importMerge">Merge safely</button><button class="btn secondary" id="importCancel">Cancel</button></div><p class="tiny">Merge preserves resident values on conflicts and records the incoming alternative in <code>import_conflicts</code>. Current unresolved conflicts: <strong id="conflictCount">0</strong>.</p></div>
+        <div class="data-section"><h3>Native + legacy MAPBOOK integration</h3><div class="actions"><button class="btn secondary" id="scanLegacyBtn">Scan this browser</button><button class="btn" id="importLegacyBtn" disabled>Normalize + import recognized Mapbook data</button></div><p>Detected Mapbook-related browser namespaces: <strong id="legacyCount">0</strong>. Legacy source keys are never deleted automatically.</p><pre id="legacyPreview">Scan not yet run.</pre></div>
+        <div class="data-section"><h3>Recovery harness</h3><div class="actions"><button class="btn" id="runTestsBtn">Run recovery checks</button></div><p id="testSummary" class="muted"></p><div id="testResults"></div></div>
+        <div class="data-section"><h3>Reset</h3><button class="btn warn" id="newMapBtn">Start a new empty Student Map</button></div>
+      </section>
+      <p class="footer-note">Privacy default: no name, email, institutional identifier, or hidden analytics ID is required. This SUPER-3 bundle includes the production native Mapbooks in <code>mapbook/</code>. Historical references are pre-populated from those files; student responses remain separate.</p>
+    </main>
+  </div>
+  <script src="manifest.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
