@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light">
-    <title>PHIL-HIST-SUPER-4 — The Philosophical Mapbook</title>
+    <title>PHIL-HIST-SUPER-4.1 — The Philosophical Mapbook</title>
     <style>
     :root {
         --bg: #f5f1ea;
@@ -2086,6 +2086,47 @@
             }
         }
 
+        const PRODUCTION_PRESSBOOKS_BINDING = Object.freeze({
+            canonical_book_url: "https://pressbooks.pub/whatmaywecarryforward/",
+            super_app_url: "https://rmertzman-tech.github.io/what-may-we-carry-forward-super/",
+            launch_mode: "new_tab",
+            bound_at: "2026-10-04T18:02:24.254Z",
+            node_urls: Object.freeze({
+                "prologue": "https://pressbooks.pub/whatmaywecarryforward/front-matter/introduction/",
+                "ch01": "https://pressbooks.pub/whatmaywecarryforward/chapter/chapter-1/",
+                "ch02": "https://pressbooks.pub/whatmaywecarryforward/chapter/a-life-as-a-whole/",
+                "intA": "https://pressbooks.pub/whatmaywecarryforward/chapter/cultivation-role-way/",
+                "ch03": "https://pressbooks.pub/whatmaywecarryforward/chapter/philosophy-under-pressure/",
+                "intB": "https://pressbooks.pub/whatmaywecarryforward/chapter/suffering-attachment-self-practice/",
+                "ch04": "https://pressbooks.pub/whatmaywecarryforward/chapter/reason-inside-an-inherited-world/",
+                "ch05": "https://pressbooks.pub/whatmaywecarryforward/chapter/rebuilding-the-map/",
+                "ch06": "https://pressbooks.pub/whatmaywecarryforward/chapter/what-can-survive-doubt/",
+                "ch07": "https://pressbooks.pub/whatmaywecarryforward/chapter/ideas-and-the-world/",
+                "ch08": "https://pressbooks.pub/whatmaywecarryforward/chapter/the-habit-of-expecting/",
+                "ch09": "https://pressbooks.pub/whatmaywecarryforward/chapter/what-must-experience-bring-with-it/",
+                "ch10": "https://pressbooks.pub/whatmaywecarryforward/chapter/whose-happiness-counts/",
+                "ch11": "https://pressbooks.pub/whatmaywecarryforward/chapter/when-values-acquire-a-history/",
+                "ch12": "https://pressbooks.pub/whatmaywecarryforward/chapter/inquiry-that-can-learn/",
+                "ch13": "https://pressbooks.pub/whatmaywecarryforward/chapter/situated-freedom/",
+                "intD": "https://pressbooks.pub/whatmaywecarryforward/chapter/persons-in-relation/",
+                "ch14": "https://pressbooks.pub/whatmaywecarryforward/chapter/you-are-here-contemporary-situated-inquiry/",
+                "lab01": "https://pressbooks.pub/whatmaywecarryforward/chapter/one-universe-many-descriptions-space-time-cosmology/",
+                "lab02": "https://pressbooks.pub/whatmaywecarryforward/chapter/where-is-the-mind/",
+                "lab03": "https://pressbooks.pub/whatmaywecarryforward/chapter/what-does-it-mean-to-be-alive/",
+                "lab04": "https://pressbooks.pub/whatmaywecarryforward/chapter/the-patient-is-not-a-population/",
+                "lab05": "https://pressbooks.pub/whatmaywecarryforward/chapter/one-world-many-maps/",
+                "lab06": "https://pressbooks.pub/whatmaywecarryforward/chapter/when-may-a-machine-decide/",
+                "epilogue": "https://pressbooks.pub/whatmaywecarryforward/back-matter/the-map-is-still-open/",
+                "intC": "https://pressbooks.pub/whatmaywecarryforward/chapter/reason-inside-an-inherited-world/"
+            })
+        });
+
+        function productionPressbooksLinks() {
+            return {
+                ...PRODUCTION_PRESSBOOKS_BINDING.node_urls
+            };
+        }
+
         function blankMap() {
             const t = now();
             return {
@@ -2113,13 +2154,13 @@
                     historical_handoff_seen_at: null
                 },
                 deployment_binding: {
-                    canonical_book_url: '',
-                    super_app_url: '',
-                    launch_mode: 'new_tab',
-                    node_urls: {},
-                    bound_at: null
+                    canonical_book_url: PRODUCTION_PRESSBOOKS_BINDING.canonical_book_url,
+                    super_app_url: PRODUCTION_PRESSBOOKS_BINDING.super_app_url,
+                    launch_mode: PRODUCTION_PRESSBOOKS_BINDING.launch_mode,
+                    node_urls: productionPressbooksLinks(),
+                    bound_at: PRODUCTION_PRESSBOOKS_BINDING.bound_at
                 },
-                pressbooks_links: {},
+                pressbooks_links: productionPressbooksLinks(),
                 migration_history: [],
                 legacy_unmapped_fields: [],
                 import_conflicts: [],
@@ -2145,6 +2186,11 @@
             for (const k of ['node_records', 'foundation_ledger', 'intervention_bridge_notes', 'laboratory_application_records', 'completion_state', 'pressbooks_links']) {
                 if (!out[k] || typeof out[k] !== 'object' || Array.isArray(out[k]))
                     out[k] = {};
+            }
+            // Backfill production Pressbooks URLs while preserving any valid browser-local override.
+            for (const [id, url] of Object.entries(PRODUCTION_PRESSBOOKS_BINDING.node_urls)) {
+                if (!validHttpUrl(out.pressbooks_links[id]))
+                    out.pressbooks_links[id] = url;
             }
             for (const k of ['migration_history', 'legacy_unmapped_fields', 'import_conflicts']) {
                 if (!Array.isArray(out[k]))
@@ -2182,8 +2228,17 @@
                 ...base.deployment_binding,
                 ...(out.deployment_binding || {})
             };
-            if (!out.deployment_binding.node_urls || typeof out.deployment_binding.node_urls !== 'object' || Array.isArray(out.deployment_binding.node_urls))
-                out.deployment_binding.node_urls = {};
+            if (!validHttpUrl(out.deployment_binding.canonical_book_url))
+                out.deployment_binding.canonical_book_url = PRODUCTION_PRESSBOOKS_BINDING.canonical_book_url;
+            if (!validHttpUrl(out.deployment_binding.super_app_url))
+                out.deployment_binding.super_app_url = PRODUCTION_PRESSBOOKS_BINDING.super_app_url;
+            if (!['new_tab', 'embedded_with_fallback'].includes(out.deployment_binding.launch_mode))
+                out.deployment_binding.launch_mode = PRODUCTION_PRESSBOOKS_BINDING.launch_mode;
+            out.deployment_binding.node_urls = {
+                ...(out.pressbooks_links || {})
+            };
+            if (!out.deployment_binding.bound_at)
+                out.deployment_binding.bound_at = PRODUCTION_PRESSBOOKS_BINDING.bound_at;
             for (const [id, rec] of Object.entries(out.completion_state || {})) {
                 if (!nodeById[id] || !rec || !['ready', 'reopen'].includes(rec.status))
                     delete out.completion_state[id];
@@ -3188,7 +3243,7 @@
                     window.open(url, '_blank', 'noopener');
             };
             $('#readState').innerHTML = valid ? '<div class="good"><strong>Canonical reading link configured.</strong> The Super App keeps cumulative inquiry state; Pressbooks remains the canonical reading source.</div>' : '<div class="notice"><strong>Pressbooks link not configured.</strong> Paste the exact public URL for this node below. The app still works without it.</div>';
-            $('#pressbooksHint').textContent = n.type === 'laboratory' ? 'Laboratory readings can be attached here without turning the laboratory into a numbered historical chapter.' : 'The 26-node Pressbooks manifest is structurally complete; exact canonical URLs remain intentionally unset until the Pressbooks webbook is published/configured.';
+            $('#pressbooksHint').textContent = valid ? 'Production Pressbooks link preloaded from PHIL-HIST-PROD-1. A valid URL saved locally overrides the production default for this browser.' : 'No valid canonical reading URL is configured for this node.';
         }
 
         function promptOrder(node) {
@@ -3459,8 +3514,11 @@
 
         function deploymentValidation() {
             const d = state.deployment_binding || {};
-            const urls = Object.values(state.pressbooks_links || {}).filter(validHttpUrl);
+            const configuredNodes = MANIFEST.nodes.filter(n => validHttpUrl(state.pressbooks_links?.[n.id]));
+            const missingNodes = MANIFEST.nodes.filter(n => !validHttpUrl(state.pressbooks_links?.[n.id])).map(n => n.id);
             const errors = [];
+            if (missingNodes.length)
+                errors.push('Missing canonical reading URLs: ' + missingNodes.join(', '));
             if (d.canonical_book_url && !validHttpUrl(d.canonical_book_url))
                 errors.push('Canonical book URL is not a valid http(s) URL.');
             if (d.super_app_url && !validHttpUrl(d.super_app_url))
@@ -3470,7 +3528,7 @@
             return {
                 ok: errors.length === 0,
                 errors,
-                configured_urls: urls.length,
+                configured_urls: configuredNodes.length,
                 total_nodes: MANIFEST.nodes.length
             };
         }
@@ -3792,6 +3850,8 @@
             });
             test('Journey handoff contains six laboratory nodes', () => MANIFEST.nodes.filter(n => n.type === 'laboratory').length === 6);
             test('Deployment binding defaults to full-screen/new-tab', () => blankMap().deployment_binding.launch_mode === 'new_tab');
+            test('Production Pressbooks binding ships 26/26 node URLs', () => MANIFEST.nodes.every(n => validHttpUrl(blankMap().pressbooks_links[n.id])));
+            test('Intervention C intentionally shares Chapter 4 reading', () => blankMap().pressbooks_links.intC === blankMap().pressbooks_links.ch04);
             test('Accessibility landmarks and skip link are present', () => !!document.querySelector('.skip-link') && !!document.querySelector('main#mainContent') && !!document.querySelector('[role=tablist]'));
             let storageOk = false;
             try {
